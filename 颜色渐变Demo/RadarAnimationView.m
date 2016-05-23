@@ -87,7 +87,7 @@ static const float timeinterval = 0.5;
     CGPoint center = CGPointMake(self.bounds.size.height / 2, self.bounds.size.width / 2);
     
     //使用贝塞尔画圆
-    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center radius:50 startAngle:0 endAngle:2 * M_PI clockwise:YES];
+    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center radius:10 startAngle:0 endAngle:2 * M_PI clockwise:YES];
 
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
     shapeLayer.frame = self.bounds;
@@ -107,7 +107,7 @@ static const float timeinterval = 0.5;
     CABasicAnimation *basicAnimation = [CABasicAnimation animation];
     basicAnimation.keyPath = @"path";
     CGPoint center = CGPointMake(self.bounds.size.height / 2, self.bounds.size.width / 2);
-    UIBezierPath *path1 = [UIBezierPath bezierPathWithArcCenter:center radius:1 startAngle:0 endAngle:2 * M_PI clockwise:YES];
+    UIBezierPath *path1 = [UIBezierPath bezierPathWithArcCenter:center radius:10 startAngle:0 endAngle:2 * M_PI clockwise:YES];
     UIBezierPath *path2 = [UIBezierPath bezierPathWithArcCenter:center radius:[UIScreen mainScreen].bounds.size.height startAngle:0 endAngle:2 * M_PI clockwise:YES];
     basicAnimation.fromValue = (__bridge id _Nullable)(path1.CGPath);
     basicAnimation.toValue = (__bridge id _Nullable)(path2.CGPath);
@@ -150,5 +150,10 @@ static const float timeinterval = 0.5;
     }
 }
 
+-(void)dealloc
+{
+    [_timer invalidate];
+    _timer = nil;
+}
 
 @end

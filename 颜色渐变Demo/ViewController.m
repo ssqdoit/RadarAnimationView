@@ -18,9 +18,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor colorWithRed:23/255.0 green:26/255.0 blue:40/255.0 alpha:1];
-    
+    self.view.backgroundColor = [UIColor whiteColor];
     RadarAnimationView *rader = [[RadarAnimationView alloc]initWithFrame:CGRectMake(100, 100, 50, 50)];
+    
     rader.center = self.view.center;
     
     rader.backgroundColor = [UIColor lightGrayColor];
