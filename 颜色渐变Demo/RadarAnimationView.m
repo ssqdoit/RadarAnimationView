@@ -12,10 +12,6 @@ static const float timeinterval = 0.5;
 #import "RadarAnimationView.h"
 
 @interface RadarAnimationView ()
-{
-    //定时器
-    NSTimer *_timer;
-}
 //按钮图片
 @property (nonatomic,strong)UIButton *iamgeBtn;
 
@@ -26,8 +22,11 @@ static const float timeinterval = 0.5;
 - (void)drawRect:(CGRect)rect {
 
     self.alpha = 0.5;
-    //创建定时器
-    _timer = [NSTimer scheduledTimerWithTimeInterval:timeinterval target:self selector:@selector(setUp) userInfo:nil repeats:YES];
+    //
+    for (int i = 0; i < 20; i++) {
+        [self addAnimationDelay:i];
+    }
+    
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -82,27 +81,22 @@ static const float timeinterval = 0.5;
 
 
 //画雷达圆圈图
--(void)setUp
+-(void)addAnimationDelay:(int)time
 {
-    CGPoint center = CGPointMake(self.bounds.size.height / 2, self.bounds.size.width / 2);
+    CGPoint centerPoint = CGPointMake(self.bounds.size.height / 2, self.bounds.size.width / 2);
     
     //使用贝塞尔画圆
-    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center radius:10 startAngle:0 endAngle:2 * M_PI clockwise:YES];
-
+    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:centerPoint radius:10 startAngle:0 endAngle:2 * M_PI clockwise:YES];
+    
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
     shapeLayer.frame = self.bounds;
     shapeLayer.fillColor = self.raderColor.CGColor;
     shapeLayer.opacity = 0.2;
     shapeLayer.path = path.CGPath;
     
-
+    
     [self.layer insertSublayer:shapeLayer below:self.iamgeBtn.layer];
     
-    [self addAnimation:shapeLayer];
-}
-
--(void)addAnimation:(CAShapeLayer *)shapeLayer
-{
     //雷达圈圈大小的动画
     CABasicAnimation *basicAnimation = [CABasicAnimation animation];
     basicAnimation.keyPath = @"path";
@@ -112,21 +106,28 @@ static const float timeinterval = 0.5;
     basicAnimation.fromValue = (__bridge id _Nullable)(path1.CGPath);
     basicAnimation.toValue = (__bridge id _Nullable)(path2.CGPath);
     basicAnimation.fillMode = kCAFillModeForwards;
-
+    
     
     //雷达圈圈的透明度
     CABasicAnimation *opacityAnimation = [CABasicAnimation animation];
     opacityAnimation.keyPath = @"opacity";
-
+    
     opacityAnimation.fromValue = @(0.2);
     opacityAnimation.toValue = @(0);
     opacityAnimation.fillMode = kCAFillModeForwards;
     
     CAAnimationGroup *group = [CAAnimationGroup animation];
     group.animations = @[basicAnimation,opacityAnimation];
-    group.duration = 7;
+    
+    //动画间隔时间  这里的值和创建的动画个数需要计算好，避免最后一轮动画结束了，第一个动画好没有结束，出现效果差
+    group.duration = 10;
+    //动画开始时间
+    group.beginTime = CACurrentMediaTime() + (double)time/2;
+    
+    //循环次数最大（无尽）  HUGE
+    group.repeatCount = HUGE;
+    
     group.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-    group.delegate = self;
     //指定的时间段完成后,动画就自动的从层上移除
     group.removedOnCompletion = YES;
     //添加动画到layer
@@ -134,26 +135,6 @@ static const float timeinterval = 0.5;
     
 }
 
--(void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
-{
-    
-    if (flag) {
-        NSLog(@"----");
-        //释放动画结束的对象  获取最上层layer
-        if ([self.layer.sublayers[0] isKindOfClass:[CAShapeLayer class]]) {
-            CAShapeLayer *shaperLayer = (CAShapeLayer *)self.layer.sublayers[0];
-            [shaperLayer removeFromSuperlayer];
-            shaperLayer = nil;
-            NSLog(@"%lu",self.layer.sublayers.count);
-        }
-  
-    }
-}
 
--(void)dealloc
-{
-    [_timer invalidate];
-    _timer = nil;
-}
 
 @end
